@@ -756,11 +756,13 @@ fn link_ios_frameworks() -> bool {
 
 fn search_and_link_frameworks_in_sub_dir(sub_dir: &str) -> bool {
 	let Ok(xcfwk_dir) = env::var(ORT_ENV_IOS_ONNX_XCFWK_LOCATION) else {
+		println!("cargo:warning=ORT_IOS_ONNX_XCFWK_LOCATION not set, cannot link iOS XCFramework");
 		return false;
 	};
 
 	let fwk_dir = Path::new(&xcfwk_dir).join(sub_dir);
 	if !fwk_dir.exists() {
+		println!("cargo:warning=Framework directory not found: {}", fwk_dir.display());
 		// Framework directory not found, dont add search path at all
 		return false;
 	}
@@ -770,6 +772,7 @@ fn search_and_link_frameworks_in_sub_dir(sub_dir: &str) -> bool {
 		println!("cargo:rustc-link-lib=framework=onnxruntime");
 	} else {
 		// Framework not found, skip attempting extension framework
+		println!("cargo:warning=onnxruntime.framework not found in {}", fwk_dir.display());
 		return false;
 	}
 
